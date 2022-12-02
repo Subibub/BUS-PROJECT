@@ -1,6 +1,8 @@
 {% load static %}
 <!doctype html>
 <html lang="ko">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 
 
 {% include 'Bus project//head.html' %}
@@ -62,9 +64,42 @@
     </form>
     </div>
     <div style="width: 1200px; height: 600px; background: gold">API넣기</div>
-    <div style="width: 430px; height: 600px; border: solid 1px black;">댓글창 만들기 + 로고 넣기</div>
-  </div>
+    <div style="width: 430px; height: 600px; border: solid 1px black;">
+        <h>댓글 </h>
+        <form action="/samchung/create_comment/" method="POST">
+            {% csrf_token %}
+            {{ comment_form}}
+            <textarea name="content" id="content" rows="15"></textarea>
+            <input type="button" class ="btnReply" value ="전송">
+            <button class="btn btn-outline-success" type="submit"> 입력 </button>
+        </form>
+        <a href ="{% url 'home' %}"><button class="btn btn-outline-success" type="submit"> 취소</button> </a>
 
+
+
+        <hr>
+        <h>댓글 리스트 </h>
+        {%  for comment in post_detai.comment_set.all %}
+        <p> {{ comment }}</p>
+        <hr>
+        {% endfor %}
+    </div>
+    <!--<form action ="{# %url 'comment_create' post.id %#}">-->
+        <input type ="text" id = "comment" name = "content" placeholder="댓글입력">
+        <button onclick="make_comment({{ post_id }}" type="submit">작성</button>
+    <!--</form>-->
+    <br><br>
+    </div>
+  </div>
+<script>
+    let btnReply = document.querySelector('.btnReply');
+    btnReply.addEventListener('click', e=> {
+        let content = document.querySelector('.replyContent').value;
+        let param = {
+            'comment' :comment,
+        }
+    })
+</script>
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: Bootstrap Bundle with Popper -->
@@ -77,3 +112,48 @@
     -->
   </body>
 </html>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#create_comment').click(function () {
+            var content= $("#comment").val();
+            $.ajax({
+                url : "/samchung/create_comment/",
+                type: "POST",
+                dataType: "json",
+                data: {
+                    'comment': comment,
+                    'csrfmiddlewaretoken': '{{csrf_token}}',
+                },
+                success: function (response) {
+                    console.log(reponse.message);
+                    $("#comment_list").append("<p>"+response.comment+"</p><hr>")
+                    $("#comment").val(' ')
+                },
+                error: function (request, status, error){
+                    alert(error);
+                },
+            })
+        });
+    });
+    function make_comment(post_id){
+        var body = $("#comment").val();
+        $.ajax({
+            url : "/comment/create",
+            type: "POST",
+            dataType: "json",
+            data: { 'post_id':post_id,
+                    'body':body,
+                    'csrfmiddlewaretoken': '{{csrf_token}}',
+                },
+            success: function (response) {
+                    console.log(reponse.message);
+                    $("#comment_list").append("<p>"+response.comment+"</p><hr>")
+                    $("#comment").val(' ')
+                },
+                error: function (request, status, error){
+                    alert(error);
+                },
+        });
+    }
+</script>

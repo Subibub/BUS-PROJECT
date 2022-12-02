@@ -16,11 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .views import Sub, Sub1
+from  content.views import new, create, create_comment, detail, home ,comment_create_ajax
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', Sub.as_view()),
-    path('samchung/', Sub1.as_view())
+    path('samchung/', Sub1.as_view()),
+    path('new/', new, name='new'),
+    path('create/', create, name='create'),
+    path('detail/<int:post_id>', detail, name = 'detail'),
+    path('samchung/create_comment/<int:post_id>', create_comment, name='samchung/create_comment/'),
+    path('home/',home , name ='home'),
+    path('comment/create',comment_create_ajax, name="comment_create_ajax")
 
 ]
-
